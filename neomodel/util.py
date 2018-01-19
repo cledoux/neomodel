@@ -63,6 +63,7 @@ class Database(local):
                                            max_connection_pool_size=config.MAX_CONNECTION_POOL_SIZE)
         self.url = url
         self._pid = os.getpid()
+        logger.debug("PID IS {}".format(self._pid))
         self._active_transaction = None
 
     @property
