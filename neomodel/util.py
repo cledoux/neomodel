@@ -44,7 +44,7 @@ class Database(local):
         self.driver = None
         self._pid = None
 
-    def set_connection(self, url):
+    def set_connection(self, url, reset_transaction=True):
         u = urlparse(url)
 
         if u.netloc.find('@') > -1 and (u.scheme == 'bolt' or u.scheme == 'bolt+routing'):
@@ -63,7 +63,9 @@ class Database(local):
                                            max_connection_pool_size=config.MAX_CONNECTION_POOL_SIZE)
         self.url = url
         self._pid = os.getpid()
-        self._active_transaction = None
+        logger.debug("PID IS {}".format(self._pid))
+        if reset_transaction:
+            self._active_transaction = None
 
     @property
     @ensure_connection
@@ -126,7 +128,7 @@ class Database(local):
             logger.error(str(err))
             logger.error("Retry attempt {}".format(retry_failed_connection))
             if retry_failed_connection <= config.MAX_CONNECTION_RETRY:
-                self.set_connection(self.url)
+                self.set_connection(self.url,reset_transaction=False)
                 return self.cypher_query(query=query, params=params, handle_unique=handle_unique,
                                          retry_on_session_expire=False, retry_failed_connection=retry_failed_connection + 1)
             raise
