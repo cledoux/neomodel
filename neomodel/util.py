@@ -44,7 +44,7 @@ class Database(local):
         self.driver = None
         self._pid = None
 
-    def set_connection(self, url, reset_transaction=True):
+    def set_connection(self, url):
         u = urlparse(url)
 
         if u.netloc.find('@') > -1 and (u.scheme == 'bolt' or u.scheme == 'bolt+routing'):
@@ -64,8 +64,7 @@ class Database(local):
         self.url = url
         self._pid = os.getpid()
         logger.debug("PID IS {}".format(self._pid))
-        if reset_transaction:
-            self._active_transaction = None
+        self._active_transaction = None
 
     @property
     @ensure_connection
@@ -128,7 +127,7 @@ class Database(local):
             logger.error(str(err))
             logger.error("Retry attempt {}".format(retry_failed_connection))
             if retry_failed_connection <= config.MAX_CONNECTION_RETRY:
-                self.set_connection(self.url,reset_transaction=False)
+                self.set_connection(self.url)
                 return self.cypher_query(query=query, params=params, handle_unique=handle_unique,
                                          retry_on_session_expire=False, retry_failed_connection=retry_failed_connection + 1)
             raise
@@ -148,14 +147,14 @@ class TransactionProxy(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if exc_value:
+        if exc_value and self.db:
             self.db.rollback()
 
         if exc_type is CypherError:
             if exc_value.code == u'Neo.ClientError.Schema.ConstraintValidationFailed':
                 raise UniqueProperty(exc_value.message)
 
-        if not exc_value:
+        if not exc_value and self.db:
             self.db.commit()
 
     def __call__(self, func):
