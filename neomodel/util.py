@@ -79,13 +79,16 @@ class Database(local):
 
     @ensure_connection
     def commit(self):
-        r = self._active_transaction.commit()
+        r = None
+        if self._active_transaction:
+            r = self._active_transaction.commit()
         self._active_transaction = None
         return r
 
     @ensure_connection
     def rollback(self):
-        self._active_transaction.rollback()
+        if self._active_transaction:
+            self._active_transaction.rollback()
         self._active_transaction = None
 
     @ensure_connection
