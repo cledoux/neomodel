@@ -16,6 +16,10 @@ if sys.version_info >= (3, 0):
 else:
     from urlparse import urlparse  # noqa
 
+if sys.version_info < (3, 3):
+    # Create an alias for the exception introduced in python 3.3
+    TimeoutError = OSError
+
 logger = logging.getLogger(__name__)
 
 
