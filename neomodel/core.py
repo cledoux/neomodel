@@ -3,7 +3,7 @@ import warnings
 import sys
 import re
 
-from .exception import DoesNotExist
+from .exceptions import DoesNotExist
 from .properties import Property, PropertyManager
 from .hooks import hooks
 from .util import Database, classproperty, _UnsavedNode
@@ -21,10 +21,10 @@ def drop_constraints(quiet=True, stdout=None):
     """
 
     results, meta = db.cypher_query("CALL db.constraints()")
-    patern = re.compile(':(.*) \).*\.(\w*)')
+    pattern = re.compile(':(.*) \).*\.(\w*)')
     for constraint in results:
         db.cypher_query('DROP ' + constraint[0])
-        match = patern.search(constraint[0])
+        match = pattern.search(constraint[0])
         stdout.write(''' - Droping unique constraint and index on label {} with property {}.\n'''.format(
             match.group(1), match.group(2)))
     stdout.write("\n")
@@ -39,18 +39,18 @@ def drop_indexes(quiet=True, stdout=None):
     """
 
     results, meta = db.cypher_query("CALL db.indexes()")
-    patern = re.compile(':(.*)\((.*)\)')
+    pattern = re.compile(':(.*)\((.*)\)')
     for index in results:
         db.cypher_query('DROP ' + index[0])
-        match = patern.search(index[0])
-        stdout.write(' - Droping index on label {} with property {}.\n'.format(
+        match = pattern.search(index[0])
+        stdout.write(' - Dropping index on label {} with property {}.\n'.format(
             match.group(1), match.group(2)))
     stdout.write("\n")
 
 
 def remove_all_labels(stdout=None):
     """
-    Calls functions for droping constraints and indexes.
+    Calls functions for dropping constraints and indexes.
 
     :param stdout: output stream
     :return: None
@@ -80,7 +80,7 @@ def install_labels(cls, quiet=True, stdout=None):
 
     if not hasattr(cls, '__label__'):
         if not quiet:
-            stdout.write(' ! Skipping class {}.{} is abstract'.format(cls.__module__, cls.__name__))
+            stdout.write(' ! Skipping class {}.{} is abstract\n'.format(cls.__module__, cls.__name__))
         return
 
     for key, prop in cls.defined_properties(aliases=False, rels=False).items():
@@ -135,6 +135,8 @@ class NodeMeta(type):
     def __new__(mcs, name, bases, dct):
         dct.update({'DoesNotExist': type('DoesNotExist', (DoesNotExist,), {})})
         inst = super(NodeMeta, mcs).__new__(mcs, name, bases, dct)
+        # needed by Python < 3.5 for unpickling DoesNotExist objects:
+        inst.DoesNotExist._model_class = inst
 
         if hasattr(inst, '__abstract_node__'):
             delattr(inst, '__abstract_node__')

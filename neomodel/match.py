@@ -1,6 +1,6 @@
 from .core import StructuredNode, db
 from .properties import AliasProperty
-from .exception import MultipleNodesReturned
+from .exceptions import MultipleNodesReturned
 import inspect
 import re
 OUTGOING, INCOMING, EITHER = 1, -1, 0
@@ -654,8 +654,8 @@ class Traversal(BaseSet):
         """
         if kwargs:
             if 'model' not in self.definition or self.definition['model'] is None:
-                raise ValueError("match() with filter only available on relationships with a model")            
-            output = process_filter_args(self.definition['model'], kwargs) 
+                raise ValueError("match() with filter only available on relationships with a model")
+            output = process_filter_args(self.definition['model'], kwargs)
             if output:
                 self.filters.append(output)
         return self

@@ -9,7 +9,7 @@ from neo4j.exceptions import ServiceUnavailable
 from neo4j.v1 import GraphDatabase, basic_auth, CypherError, SessionError
 
 from . import config
-from .exception import UniqueProperty, ConstraintValidationFailed
+from .exceptions import UniqueProperty, ConstraintValidationFailed
 
 if sys.version_info >= (3, 0):
     from urllib.parse import urlparse

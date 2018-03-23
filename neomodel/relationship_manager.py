@@ -1,7 +1,7 @@
 import sys
 import functools
 from importlib import import_module
-from .exception import NotConnected
+from .exceptions import NotConnected
 from .util import deprecated
 from .match import OUTGOING, INCOMING, EITHER, _rel_helper, Traversal, NodeSet
 from .relationship import StructuredRel
@@ -68,8 +68,10 @@ class RelationshipManager(object):
         self._check_node(node)
 
         if not self.definition['model'] and properties:
-            raise NotImplementedError("Relationship properties without " +
-                    "using a relationship model is no longer supported")
+            raise NotImplementedError(
+                "Relationship properties without using a relationship model "
+                "is no longer supported."
+            )
 
         params = {}
         rel_model = self.definition['model']
