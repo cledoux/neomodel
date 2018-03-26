@@ -1,6 +1,9 @@
 .. image:: https://raw.githubusercontent.com/robinedwards/neomodel/master/doc/source/_static/neomodel-300.png
    :alt: neomodel
 
+NOTE: This is a customized version of neomodel for personal use. Use the
+`official version`_ instead.
+
 An Object Graph Mapper (OGM) for the neo4j_ graph database, built on the awesome neo4j_driver_
 
 - Familiar Django model style definitions.
@@ -14,6 +17,7 @@ An Object Graph Mapper (OGM) for the neo4j_ graph database, built on the awesome
 .. _django_neomodel: https://github.com/robinedwards/django-neomodel
 .. _neo4j: https://www.neo4j.org
 .. _neo4j_driver: https://github.com/neo4j/neo4j-python-driver
+.. _official version: https://github.com/neo4j-contrib/neomodel
 
 .. image:: https://secure.travis-ci.org/robinedwards/neomodel.png
     :target: https://secure.travis-ci.org/robinedwards/neomodel/
